@@ -96,13 +96,16 @@ type SuperAgent struct {
 var DisableTransportSwap = false
 
 //New Used to create a new SuperAgent object.
-func New() *SuperAgent {
+func New(timeout ...int) *SuperAgent {
 	cookiejarOptions := cookiejar.Options{
 		PublicSuffixList: publicsuffix.List,
 	}
 	jar, _ := cookiejar.New(&cookiejarOptions)
 	//janmir
-	timeOut := time.Second * 15
+	cancelTime := time.Second * 15
+	if len(timeout) > 0 {
+		cancelTime = time.Second * time.Duration(timeout[0])
+	}
 
 	debug := os.Getenv("GOREQUEST_DEBUG") == "1"
 
@@ -119,7 +122,7 @@ func New() *SuperAgent {
 		//janmir
 		Client: &http.Client{
 			Jar:     jar,
-			Timeout: timeOut,
+			Timeout: cancelTime,
 		},
 		Transport:   &http.Transport{},
 		Cookies:     make([]*http.Cookie, 0),
