@@ -92,14 +92,17 @@ type SuperAgent struct {
 	DoNotClearSuperAgent bool
 }
 
+//DisableTransportSwap ...
 var DisableTransportSwap = false
 
-// Used to create a new SuperAgent object.
+//New Used to create a new SuperAgent object.
 func New() *SuperAgent {
 	cookiejarOptions := cookiejar.Options{
 		PublicSuffixList: publicsuffix.List,
 	}
 	jar, _ := cookiejar.New(&cookiejarOptions)
+	//janmir
+	timeOut := time.Second * 15
 
 	debug := os.Getenv("GOREQUEST_DEBUG") == "1"
 
@@ -113,14 +116,18 @@ func New() *SuperAgent {
 		QueryData:         url.Values{},
 		FileData:          make([]File, 0),
 		BounceToRawString: false,
-		Client:            &http.Client{Jar: jar},
-		Transport:         &http.Transport{},
-		Cookies:           make([]*http.Cookie, 0),
-		Errors:            nil,
-		BasicAuth:         struct{ Username, Password string }{},
-		Debug:             debug,
-		CurlCommand:       false,
-		logger:            log.New(os.Stderr, "[gorequest]", log.LstdFlags),
+		//janmir
+		Client: &http.Client{
+			Jar:     jar,
+			Timeout: timeOut,
+		},
+		Transport:   &http.Transport{},
+		Cookies:     make([]*http.Cookie, 0),
+		Errors:      nil,
+		BasicAuth:   struct{ Username, Password string }{},
+		Debug:       debug,
+		CurlCommand: false,
+		logger:      log.New(os.Stderr, "[gorequest]", log.LstdFlags),
 	}
 	// disable keep alives by default, see this issue https://github.com/parnurzeal/gorequest/issues/75
 	s.Transport.DisableKeepAlives = true
